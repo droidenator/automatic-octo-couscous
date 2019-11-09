@@ -48,7 +48,7 @@ function ElevatorController({ floors, elevators }) {
         destinationFloor,
       });
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
   }
 
@@ -59,25 +59,51 @@ function ElevatorController({ floors, elevators }) {
       if (my.requests[requestEvent].length < my.elevators) return;
 
       my.emitter.removeAllListeners(requestEvent);
-      pickElevator(my.requests[requestEvent], tripRequest);
+      pickElevator(my.requests[requestEvent], { ...tripRequest, requestEvent });
     };
   }
 
   function pickElevator(elevators, tripRequest) {
     const { currentFloor, destinationFloor } = tripRequest;
-
-    const availableElevators = elevators.filter(elevator => elevator.avaible);
-    const onCurrentFloor = elevators.filter(
-      elevator =>
-        elevator.available &&
-        elevator.currentFloor === currentFloor &&
-        !elevator.moving
+    const direction = currentFloor < destinationFloor ? 'up' : 'down';
+    const availableElevators = elevators.filter(elevator => elevator.available);
+    const onCurrentFloor = availableElevators.filter(
+      elevator => elevator.currentFloor === currentFloor && !elevator.moving
     );
 
     if (onCurrentFloor.length) {
       callElevator(onCurrentFloor[0].id, tripRequest);
       return;
     }
+
+    const movingElevators = availableElevators.filter(
+      elevator => elevator.moving && elevator.direction === direction
+    );
+    if (movingElevators.length) {
+      const elevator = pickClosestElevator(movingElevators, currentFloor);
+      callElevator(elevator.id, tripRequest);
+      return;
+    }
+
+    const unoccupiedElevators = availableElevators.filter(
+      elevator => !elevator.moving
+    );
+    const elevator = pickClosestElevator(unoccupiedElevators, currentFloor);
+
+    callElevator(elevator.id, tripRequest);
+  }
+
+  function pickClosestElevator(elevators, floor) {
+    return elevators.reduce((closest, elevator) => {
+      if (
+        !closest ||
+        Math.abs(closest.currentFloor - floor) >
+          Math.abs(elevator.currentFloor - floor)
+      ) {
+        return elevator;
+      }
+      return closest;
+    }, null);
   }
 
   function assertFloorIsValid(floor) {
