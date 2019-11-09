@@ -2,7 +2,7 @@
 
 const MAX_TRIPS_BEFORE_MAITENANCE = 100;
 
-function Elevator({ emitter, startingFloor, elevatorId }) {
+function Elevator({ emitter, startingFloor = 1, elevatorId }) {
   const my = {
     currentFloor: null,
     doorOpen: null,
@@ -12,7 +12,9 @@ function Elevator({ emitter, startingFloor, elevatorId }) {
     floorsPassed: 0,
   };
 
-  const that = {};
+  const that = {
+    callElevator,
+  };
 
   function init() {
     my.emitter = emitter;
@@ -22,15 +24,19 @@ function Elevator({ emitter, startingFloor, elevatorId }) {
     my.emitter.emit('elevatorInit', { id: my.elevatorId });
   }
 
-  function callElevator(currentFloor, destinationFloor) {
-    // Current or destination floor must be between 1 and max # of floors
-    // Emit request for elevator to all elevators
-    // Pick best elevator from responses
+  function registerEventListeners() {
+    my.emitter.on('requestElevator', elevatorRequest);
   }
+
+  function elevatorRequest() {}
 
   function moveToFloor(direction) {}
 
   function operateDoor(open) {}
+
+  init();
+
+  return that;
 }
 
 module.exports = Elevator;

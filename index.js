@@ -1,9 +1,4 @@
-const Elevator = require('./Elevator');
-const EventEmitter = require('events');
+'use strict';
 
-function initialize(floors, elevators) {
-  // Create and init elevators
-  // Create floors
-}
-
-function callElevator(currentFloor, destinationFloor) {}
+const ElevatorController = require('./ElevatorController');
+const elevatorController = ElevatorController({ floors: 10, elevators: 5 });
