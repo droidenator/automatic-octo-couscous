@@ -10,27 +10,38 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
     emitter: null,
     trips: 0,
     floorsPassed: 0,
+    passengers: [],
   };
 
-  const that = {
-    callElevator,
-  };
+  const that = {};
 
   function init() {
     my.emitter = emitter;
     my.currentFloor = startingFloor;
     my.doorOpen = true;
     my.elevatorId = elevatorId;
-    my.emitter.emit('elevatorInit', { id: my.elevatorId });
+    emitStatusUpdate(`Elevator ${my.elevatorId} created`);
+    registerEventListeners();
+  }
+
+  function emitStatusUpdate(msg) {
+    my.emitter.emit('elevatorStatusUpdate', msg);
   }
 
   function registerEventListeners() {
     my.emitter.on('requestElevator', elevatorRequest);
   }
 
-  function elevatorRequest() {}
+  function elevatorRequest({ currentFloor, destinationFloor }) {
+    // Determine if elevator can accept request
+  }
 
-  function moveToFloor(direction) {}
+  function moveToFloor(direction) {
+    my.currentFloor =
+      direction === 'up' ? my.currentFloor + 1 : my.currentFloor - 1;
+    my.floorsPassed = my.floorsPassed + 1;
+    emitStatusUpdate(`Elevator ${id} moved to floor ${my.currentFloor}`);
+  }
 
   function operateDoor(open) {}
 
