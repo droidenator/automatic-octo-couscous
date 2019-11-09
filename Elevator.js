@@ -36,6 +36,8 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
   }
 
   function elevatorRequest({ requestEvent, currentFloor, destinationFloor }) {
+    // This is an area that I would probably refactor heavily given more time to be sure
+    // I'm getting the right data passed over.
     const response = {
       available: !my.requiresMaintenace,
       currentFloor: my.currentFloor,
@@ -53,14 +55,20 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
     my.passengers.push(tripRequest);
     my.currentDirection = currentFloor < destinationFloor ? 'up' : 'down';
 
+    // Towards the end of my 2 hours, it dawned on me that I should move to the new
+    // floor and then let the moveToNewFloor function decide what to do next. This current
+    // implementation works fine assuming there's a single passenger per elevator but breaks
+    // down once an elevator picks up an additional passenger
     while (my.currentFloor !== destinationFloor) {
       await moveToNewFloor();
     }
 
+    // Last minute hacking below
     operateDoor(true);
     my.passengers = [];
     my.currentDirection = null;
     my.trips++;
+    if (my.trips === 100) my.requiresMaintenace = true;
   }
 
   function moveToNewFloor() {

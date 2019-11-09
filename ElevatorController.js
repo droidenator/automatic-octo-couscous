@@ -76,6 +76,11 @@ function ElevatorController({ floors, elevators }) {
       return;
     }
 
+    // The logic past this point isn't solid. The way I'm requesting elevators in index.js causes some problems
+    // That is, because I'm requesting the elevators as fast as I can but using setTimeout when moving elevators,
+    // I end up in a weird state.
+    return;
+
     const movingElevators = availableElevators.filter(
       elevator => elevator.moving && elevator.direction === direction
     );
@@ -93,6 +98,7 @@ function ElevatorController({ floors, elevators }) {
     callElevator(elevator.id, tripRequest);
   }
 
+  // I didn't get much time to test this function
   function pickClosestElevator(elevators, floor) {
     return elevators.reduce((closest, elevator) => {
       if (
