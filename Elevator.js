@@ -11,7 +11,7 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
     trips: 0,
     floorsPassed: 0,
     passengers: [],
-    requireMaintenace: false,
+    requiresMaintenace: false,
   };
 
   const that = {};
@@ -36,7 +36,8 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
 
   function elevatorRequest({ requestEvent, currentFloor, destinationFloor }) {
     const response = {
-      available: !my.requireMaintenace,
+      available: !my.requiresMaintenace,
+      currentFloor: my.currentFloor,
       id: my.elevatorId,
       occupied: !!my.passengers.length,
       moving: !my.doorOpen,
@@ -44,7 +45,10 @@ function Elevator({ emitter, startingFloor = 1, elevatorId }) {
     my.emitter.emit(requestEvent, response);
   }
 
-  function handleTrip() {}
+  function handleTrip(tripRequest) {
+    my.doorOpen = false;
+    my.passengers.push(tripRequest);
+  }
 
   function moveToFloor(direction) {
     my.currentFloor =
